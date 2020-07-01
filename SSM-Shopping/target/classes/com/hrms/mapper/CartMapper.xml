@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.CartMapper">
+    <sql id="table_name">tbl_cart</sql>
+    <sql id="select_fields">
+      cart_id, cart_user, cart_price, cart_number, cart_abstract
+    </sql>
+    <sql id="select_withuser_fields">
+        cart_id, cart_user, cart_price, cart_number, cart_abstract,user_id, user_name, user_password, gender, user_phone ,user_address,user_city,user_email,user_postcode,user_lastdate,user_payment
+    </sql>
+    
+     <resultMap id="withUserResultMap" type="com.hrms.bean.Cart">
+        <id column="cart_id" property="cartId"></id>
+        <result column="cart_user" property="cartUser"></result>
+        <result column="cart_price" property="cartPrice"></result>
+        <result column="cart_number" property="cartNum"></result>
+        <result column="cart_abstract" property="cartAbstract"></result>
+        <association property="user" column="cart_user" javaType="com.hrms.bean.User">
+            <id column="user_id" property="userId"></id>
+            <result column="user_name" property="userName"></result>
+            <result column="user_password" property="userPassword"></result>
+            <result column="gender" property="gender"></result>
+            <result column="user_phone" property="userPhone"></result>
+            <result column="user_address" property="userAddress"></result>
+            <result column="user_city" property="city"></result>
+            <result column="user_email" property="email"></result>
+            <result column="user_postcode" property="userPostcode"></result>
+            <result column="user_lastdate" property="userLastdate"></result>
+            <result column="user_payment" property="payment"></result>
+        </association>
+    </resultMap>
+
+
+    <select id="selectOneById" parameterType="java.lang.Integer" resultMap="withUserResultMap">
+        SELECT
+        <include refid="select_withuser_fields"/>
+        FROM
+        tbl_cart e, tbl_user d
+        WHERE
+        e.cart_user = d.user_id
+        AND
+        e.cart_id = #{cartId}
+    </select>
+
+    <select id="selectByLimitAndOffset" resultMap="withUserResultMap">
+        SELECT
+        <include refid="select_withuser_fields"/>   
+         FROM
+       tbl_cart e
+        LEFT JOIN
+        tbl_user d
+        ON
+        e.cart_user = d.user_id
+        ORDER BY e.cart_id
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="updateOneById" parameterType="com.hrms.bean.Cart">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        cart_price = #{cart.cartPrice, jdbcType = FLOAT},
+        cart_number = #{cart.cartNum, jdbcType = INTEGER},
+        cart_abstract = #{cart.cartAbstract, jdbcType = VARCHAR}
+        WHERE
+        cart_id = #{cartId, jdbcType = INTEGER}
+    </update>
+</mapper>

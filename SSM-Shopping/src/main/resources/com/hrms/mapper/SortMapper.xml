@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.SortMapper">
+    <sql id="table_name">tbl_sort</sql>
+    <sql id="select_fields">
+      sort_id, sort_name, sort_kind
+    </sql>
+    <sql id="select_withkind_fields">
+        sort_id, sort_name, sort_kind, kind_id, kind_name
+    </sql>
+
+    <resultMap id="withKindResultMap" type="com.hrms.bean.Sort">
+        <id column="sort_id" property="sortId"></id>
+        <result column="sort_name" property="sortName"></result>
+        <result column="sort_kind" property="sortKind"></result>
+        <association property="kind" column="sort_kind" javaType="com.hrms.bean.Kind">
+            <id column="kind_id" property="kindId"></id>
+            <result column="kind_name" property="kindName"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectOneById" parameterType="java.lang.Integer" resultType="com.hrms.bean.Sort">
+        SELECT
+        sort_id sortId, sort_name sortName, sort_kind sortKind
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        sort_id = #{sortId}
+    </select>
+
+    <select id="selectOneByName" parameterType="String" resultType="com.hrms.bean.Sort">
+        SELECT
+        sort_id sortId, sort_name sortName, sort_kind sortKind    
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        sort_name = #{sortName}
+    </select>
+
+    <select id="selectWithKindById" parameterType="Integer"  resultMap="withKindResultMap">
+        SELECT
+        <include refid="select_withkind_fields"/>
+        FROM
+       tbl_sort e, tbl_kind d
+        WHERE
+        e.sort_kind= d.kind_id
+        AND
+        e.sort_id = #{sortId}
+    </select>
+
+    <select id="selectByLimitAndOffset" resultMap="withKindResultMap">
+        SELECT
+        <include refid="select_withkind_fields"/>
+        FROM
+        tbl_sort e
+        LEFT JOIN
+        tbl_kind d
+        ON
+        e.sort_kind = d.kind_id
+        ORDER BY e.sort_id
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="updateOneById" parameterType="com.hrms.bean.Sort">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        sort_name = #{sort.sortName, jdbcType = VARCHAR},
+        sort_kind = #{sort.sortKind, jdbcType = INTEGER}
+        WHERE
+        sort_id = #{sortId, jdbcType = INTEGER}
+    </update>
+</mapper>

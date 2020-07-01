@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.KindMapper">
+    <sql id="table_name">
+        tbl_kind
+    </sql>
+    <sql id="select_fields">
+        kind_id , kind_name
+    </sql>
+    <resultMap id="kindResult" type="com.hrms.bean.Kind">
+        <id column="kind_id" property="kindId"></id>
+        <result column="kind_name" property="kindName"></result>
+    </resultMap>
+
+    <select id="selectKindsByLimitAndOffset" resultMap="kindResult">
+        SELECT
+        <include refid="select_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="updateKindById" parameterType="com.hrms.bean.Kind">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        kind_name = #{kind.kindName, jdbcType = VARCHAR}
+        WHERE
+        kind_id = #{kindId, jdbcType = INTEGER}
+    </update>
+
+</mapper>

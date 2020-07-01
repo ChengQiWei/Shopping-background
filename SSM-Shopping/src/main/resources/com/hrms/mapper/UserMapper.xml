@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.UserMapper">
+    <sql id="table_name">tbl_user</sql>
+    <sql id="select_fields">
+      user_id, user_name, user_password, gender, user_phone ,user_address,user_city,user_email,user_postcode,user_lastdate,user_payment
+    </sql>
+    
+     <resultMap id="userResult" type="com.hrms.bean.User">
+        <id column="user_id" property="userId"></id>
+        <result column="user_name" property="userName"></result>
+        <result column="user_password" property="userPassword"></result>
+        <result column="gender" property="gender"></result>
+        <result column="user_phone" property="userPhone"></result>
+        <result column="user_address" property="userAddress"></result>
+        <result column="user_city" property="city"></result>
+        <result column="user_email" property="email"></result>
+        <result column="user_postcode" property="userPostcode"></result>
+        <result column="user_lastdate" property="userLastdate"></result>
+        <result column="user_payment" property="payment"></result>
+    </resultMap>
+   
+  <select id="selectOneUserById" parameterType="java.lang.Integer" resultMap="userResult">
+        SELECT
+        <include refid="select_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        user_id = #{userId}
+    </select>
+    
+    <select id="selectOneUserByName" parameterType="String" resultMap="userResult">
+        SELECT
+        <include refid="select_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        user_name = #{userName}
+    </select>
+    
+    <select id="selectUserByLimitAndOffset" resultMap="userResult">
+        SELECT
+        <include refid="select_fields"/>
+        FROM
+        <include refid="table_name"></include>
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <update id="updateOneById" parameterType="com.hrms.bean.User">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        user_password = #{user.userPassword, jdbcType = VARCHAR},
+        gender = #{user.gender, jdbcType = VARCHAR},
+        user_phone = #{user.userPhone, jdbcType = VARCHAR},
+        user_address = #{user.userAddress, jdbcType = VARCHAR},
+        user_city = #{user.city, jdbcType = VARCHAR},
+        user_email = #{user.email, jdbcType = VARCHAR},
+        user_postcode = #{user.userPostcode, jdbcType = VARCHAR},
+        user_lastdate = #{user.userLastdate, jdbcType = DATE},
+        user_payment = #{user.payment, jdbcType = FLOAT}
+        WHERE
+        user_id = #{userId, jdbcType = INTEGER}
+    </update>
+    
+    
+</mapper>

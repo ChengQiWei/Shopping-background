@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.GoodsMapper">
+    <sql id="table_name">tbl_goods</sql>
+    <sql id="select_fields">
+      goods_id, goods_name, goods_brand, goods_place, goods_price ,goods_abstract,goods_kind,goods_sort,goods_adddate,goods_image,goods_number
+    </sql>
+    <sql id="select_withkind_fields">
+       goods_id, goods_name, goods_brand, goods_place, goods_price ,goods_abstract,goods_kind,goods_sort,goods_adddate,goods_image, goods_number,kind_id, kind_name,sort_id,sort_name
+    </sql>
+
+    <resultMap id="withKindResultMap" type="com.hrms.bean.Goods">
+        <id column="goods_id" property="goId"></id>
+        <result column="goods_name" property="goName"></result>
+        <result column="goods_brand" property="goBrand"></result>
+        <result column="goods_place" property="goPlace"></result>
+        <result column="goods_price" property="goPrice"></result>
+        <result column="goods_abstract" property="goAbstract"></result>
+        <result column="goods_kind" property="goKind"></result>
+         <result column="goods_sort" property="goSort"></result>
+        <result column="goods_adddate" property="goAdddate"></result>
+        <result column="goods_image" property="goImage"></result>
+        <result column="goods_number" property="goNum"></result>
+        <association property="kind" column="goods_kind" javaType="com.hrms.bean.Kind">
+            <id column="kind_id" property="kindId"></id>
+            <result column="kind_name" property="kindName"></result>
+        </association>
+        <association property="sort" column="goods_sort" javaType="com.hrms.bean.Sort">
+            <id column="sort_id" property="sortId"></id>
+            <result column="sort_name" property="sortName"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectOneGoById" parameterType="java.lang.Integer" resultType="com.hrms.bean.Goods">
+        SELECT
+        goods_id  goId, goods_name goName, goods_brand goBrand, goods_place goPlace, goods_price goPrice,goods_abstract  goAbstract,goods_kind goKind,goods_sort goSort,goods_adddate  goAdddate,goods_image  goImage,goods_number goNum
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        goods_id = #{goId}
+    </select>
+
+    <select id="selectOneGoByName" parameterType="String" resultType="com.hrms.bean.Goods">
+        SELECT
+        goods_id  goId, goods_name goName, goods_brand goBrand, goods_place goPlace, goods_price goPrice,goods_abstract  goAbstract,goods_kind goKind,goods_sort goSort,goods_adddate  goAdddate,goods_image  goImage,goods_number goNum
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        goods_name = #{goName}
+    </select>
+
+    <select id="selectWithKindById" parameterType="Integer"  resultMap="withKindResultMap">
+        SELECT
+        <include refid="select_withkind_fields"/>
+        FROM
+       tbl_goods e, tbl_kind d,  tbl_sort f
+        WHERE
+        e.goods_kind = d.kind_id  AND e.goods_sort=f.sort_id
+        AND
+        e.goods_id = #{goId}
+    </select>
+
+    <select id="selectByAny" resultMap="withKindResultMap">
+        SELECT
+         <include refid="select_withkind_fields"></include>
+        FROM
+        tbl_goods e
+        LEFT JOIN
+        tbl_kind d
+        ON
+        e.goods_kind = d.kind_id
+        ORDER BY e.goods_id
+        WHERE e.goods_name= #{goAny} OR e.goods_brand=#{goAny} OR e.goods_place =#{goAny} OR e.goods_abstract=#{goAny} OR d.kind_name= #{goAny}
+    </select>
+    
+    <select id="selectByLimitAndOffset" resultMap="withKindResultMap">
+        SELECT
+         <include refid="select_withkind_fields"></include>
+        FROM
+        tbl_goods e
+        LEFT JOIN
+        tbl_kind d
+        ON
+        e.goods_kind = d.kind_id
+        LEFT JOIN
+        tbl_sort f
+        ON
+        e.goods_sort = f.sort_id
+        WHERE e.goods_name= #{goAny} OR e.goods_brand=#{goAny} OR e.goods_place =#{goAny} OR e.goods_abstract=#{goAny} OR e.goods_kong=#{goAny} OR d.kind_name= #{goAny} 
+        ORDER BY e.goods_id
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+     <select id="countGoodss" parameterType="String" resultType="Integer">
+        SELECT
+         count(*)
+        FROM
+        tbl_goods e
+        LEFT JOIN
+        tbl_kind d
+        ON
+        e.goods_kind = d.kind_id
+        LEFT JOIN
+        tbl_sort f
+        ON
+        e.goods_sort = f.sort_id
+        WHERE e.goods_name= #{goAny} OR e.goods_brand=#{goAny} OR e.goods_place =#{goAny} OR e.goods_abstract=#{goAny} OR e.goods_kong=#{goAny} OR d.kind_name= #{goAny} 
+    </select>
+
+    <update id="updateOneById" parameterType="com.hrms.bean.Goods">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        goods_brand = #{goods.goBrand, jdbcType = VARCHAR},
+        goods_place = #{goods.goPlace, jdbcType = VARCHAR},
+        goods_price = #{goods.goPrice, jdbcType = FLOAT},
+        goods_abstract = #{goods.goAbstract, jdbcType = VARCHAR},
+        goods_kind = #{goods.goKind, jdbcType = INTEGER},
+        goods_sort = #{goods.goSort, jdbcType = INTEGER},
+        goods_adddate = #{goods.goAdddate, jdbcType = DATE},
+        goods_image = #{goods.goImage, jdbcType = VARCHAR},
+        goods_number = #{goods.goNum, jdbcType = INTEGER}
+        WHERE
+        goods_id = #{goId, jdbcType = INTEGER}
+    </update>
+</mapper>
